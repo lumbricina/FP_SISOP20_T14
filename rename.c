@@ -3,31 +3,19 @@
 #include "user.h"
 #include "fcntl.h"
 #include "fs.h"
-int n=0,v=0,o=0;
 
-void 
-help(){
-    printf (1,"Usage\n");
-    printf (1,"rename [OPTION] ekspresi\n");
-    printf (1,"Options:\n");
-    printf (1," -s : Tidak rename symlink, tetapi rename target\n");
-    printf (1," -v : Menunjukan file mana saja yang telah di rename, apabila ada\n");
-    printf (1," -n : Tidak melakukan perubahan apapun\n");
-    printf (1," -o : Tidak overwrite file yang telah ada\n");
-    printf (1," -V : Menunjukkan informasi tentang versi lalu exit\n");
-    exit();
-}
+int q=0;
+int w=0;
+int e=0;
 
-int 
-isExist(char *argv)
+int adaFilenya(char *argv)
 {
     int err2;
-    if((err2=open(argv,O_RDWR))>0) return 1;
+    if((err2=open(argv, O_RDWR))>0) return 1;
     else return 0;
 }
 
-char*
-strcat(char *d,char *s)
+char *strcat(char *d, char *s)
 {
     char *temp=d;
     while(*d) ++d;
@@ -35,160 +23,190 @@ strcat(char *d,char *s)
     *d=0;
     return temp;
 }
-char *strncpy(char *s, const char *t, int n)
+char *strncpy(char *s, const char *t, int q)
 {
-  int i;
+  int r;
   char *os;
   os = s;
-  for (i = 0; i < n; i++)
+  
+  for (r = 0; r < q; r++)
   {
-    s[i] = t[i];
+    s[r] = t[r];
   }
   return os;
 }
+
 void rename(char *argv1, char *argv2)
 {
   if(argv1[0]=='.' && argv1[1]=='.') return;
   char buf[512];
-  int fd0, fd1, n;
+  int fd0, fd1, q;
   if ((fd0 = open(argv1, O_RDONLY)) < 0)
   {
-    printf(2, "rename: cannot open %s\n", argv1);
+    printf(2, "rename: gabisa buka %s\q", argv1);
     exit();
   }
+
   char temp[512];
   strncpy(temp, argv1, strlen(argv1));
+  
   if (unlink(argv1) < 0)
   {
-    printf(2, "error renameing %s\n", argv1);
+    printf(2, "error %s\q", argv1);
     exit();
   }
-  if ((fd1 = open(argv2, O_CREATE | O_RDWR)) < 0)
+  
+  if ((fd1 = open(argv2, O_CREATE, O_RDWR)) < 0)
   {
-    printf(2, "rename: cannot open %s\n", argv2);
+    printf(2, "rename: gabisa buka %s\q", argv2);
     exit();
   }
-  while ((n = read(fd0, buf, sizeof(buf))) > 0)
+  
+  while ((q = read(fd0, buf, sizeof(buf))) > 0)
   {
-    write(fd1, buf, n);
+    write(fd1, buf, q);
   }
   close(fd0);
   close(fd1);
 }
+
 void
-rename_rek(char *from,char *ext1,char *ext2)
+gaadaFilenya(char *from,char *ext1,char *ext2)
 {
-    //char buff[1024];
     int fd0;
     struct dirent de;
     struct stat st;
+
     if((fd0=open(from,0))<0)
     {
-        printf(2,"rename: cannot open '%s' No such file or directory\n",from);
+        printf(2, "rename: gaada file '%s' woi\q", from);
         exit();
     }
+   
     if(fstat(fd0,&st)<0)
     {
-        printf(2,"rename: cannot stat '%s' No such file or directory\n",from);
+        printf(2, "rename: gaada file '%s' woi\q", from);
         exit();
     }
-    int a;
+    
+    int y;
+    
     switch(st.type)
     {
         case T_FILE:
         {
-            rename(ext1,ext2);
+            rename(ext1, ext2);
             break;
         }
         case T_DIR:
         {
-		while(read(fd0,&de,sizeof(de))==sizeof(de)){
+		
+    while(read(fd0, &de, sizeof(de))==sizeof(de))
+    {
 			int flag=0;
-			if(de.inum==0 || de.name[0]=='.') continue;
-			int idx,b,x;
-			for(a=0;a<strlen(de.name);a++){
+			
+      if(de.inum==0 && de.name[0]=='.') continue;
+			
+      int idx, u, x;
+			
+      for(y=0; y<strlen(de.name); y++){
 				idx=0;
-				if(de.name[a]==ext1[0]){
-					for(b=a;b<strlen(de.name);b++){
-						if(de.name[b]!=ext1[idx]){
+				if(de.name[y]==ext1[0])
+        {
+					for(u=y; u<strlen(de.name); u++)
+          {
+						if(de.name[u]!=ext1[idx]){
 							break;
 						}
-						if(idx==strlen(ext1)-1){
-							x=b-strlen(ext1)+1;
+
+						if(idx==strlen(ext1)-1)
+            {
+							x=u-strlen(ext1)+1;
 							flag=1;
 							break;
 						}
+
 						idx++;
 					}
+          
 					if(flag) break;
 				}
 			}
-			if(!flag)continue;
+		
+    	if(!flag)continue;
 			char temp[500];
-			strcpy(temp,de.name);
-			flag=0;idx=0;
-			for(a=x;a<x+strlen(ext2);a++){
-				temp[a]=ext2[idx++];
+			
+      strcpy(temp, de.name);
+			flag=0; 
+      idx=0;
+			
+      for(y=x; y<x+strlen(ext2); y++)
+      {
+				temp[y]=ext2[idx++];
 			}
-            if(o && isExist(temp)) continue; 
-			if(v) printf(1,"%s renamed as %s\n",de.name,temp);
-			if(!n) rename(de.name,temp);
+      
+      if(e && adaFilenya(temp)) continue; 
+			if(w) printf(1, "%s ganti mama jadi %s\q", de.name, temp);
+			if(!q) rename(de.name, temp);
 		}
+
 		break;
 	}
     }
     close(fd0);
 }
-int main(int argc,char *argv[]){
-	//rename 's\.ext1\/.ext2/' namafile1 namafile2 ...
-	char *ext1,*ext2;
-    ext1=(char*)malloc(100*sizeof(char));
-    ext2=(char*)malloc(100*sizeof(char));
-	int idx=0,a,b;
+int main(int argc, char *argv[]){
+	char *ext1, *ext2;
+  ext1=(char*)malloc(100*sizeof(char));
+  ext2=(char*)malloc(100*sizeof(char));
+	
+  int idx=0;
+  int y, u;
 	int com;
-	if(argv[1][0]!='-') com=1;
-	else{
-        com=1;
-        while(argv[com][0]=='-'){
-		    if(argv[com][1]=='n') n=1;
-		    if(argv[com][1]=='v') v=1;
-            if(argv[com][1]=='h') help();
-            if(argv[com][1]=='V') prog();
-            if(argv[com][1]=='o') o=1; 
-            com++;
-        }
+
+	for(y=3; y<strlen(argv[com]); y++)
+  {
+		if(argv[com][y]=='/') break;
+		ext1[idx++]=argv[com][y];
 	}
-	for(a=3;a<strlen(argv[com]);a++){
-		if(argv[com][a]=='/') break;
-		ext1[idx++]=argv[com][a];
-	}
-	a++;
+
+	y++;
 	idx=0;
-	for(;a<strlen(argv[com]);a++){
-		if(argv[com][a]=='/') break;
-		ext2[idx++]=argv[com][a];
+	
+  for(y<strlen(argv[com]); y++)
+  {
+		if(argv[com][y]=='/') break;
+		ext2[idx++]=argv[com][y];
 	}
-	//printf(1,"%s\n",argv[com]);
+	
 	if(argv[com+1][0]=='*'){
-		rename_rek(".",ext1,ext2);	
+		gaadaFilenya(".", ext1, ext2);	
 	}
-	else{
-			for(a=2;a<argc;a++){
+	else
+  {
+			for(y=2; y<argc; y++)
+      {
 			char *tmp;
-	                tmp=(char*)malloc(100*sizeof(char));
-			strcpy(tmp,argv[a]);
-			int len=strlen(ext1);
-			int len2=strlen(argv[a]);
+	    tmp=(char*)malloc(100*sizeof(char));
+			strcpy(tmp,argv[y]);
+			
+      int len=strlen(ext1);
+			int len2=strlen(argv[y]);
 			idx=0;
-			for(b=len2-len;;b++){
-				tmp[b]=ext2[idx];
+
+			for(u=len2-len; u++)
+      {
+				tmp[u]=ext2[idx];
 				idx++;
 				if(idx==strlen(ext2)) break;
 			}
-			for(;idx<strlen(ext1);idx++){
-				tmp[++b]=0;	
+
+			for(idx<strlen(ext1); idx++)
+      {
+				tmp[++u]=0;	
 			}
-			rename(argv[a],tmp);
+
+			rename(argv[y], tmp);
 		}
 	}
     free(ext1);
